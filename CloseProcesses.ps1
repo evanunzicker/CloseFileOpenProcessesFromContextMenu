@@ -28,7 +28,7 @@ function Get-OpenFileProcessesUsingHandle {
 
     Write-Host "Checking for processes using handle.exe: '$file'"
     $fileProcesses = @()
-#Replace 'PATH' with actual path to handle.exe
+    #Replace 'PATH' with actual path to handle.exe
     $handleOutput = & "C:\PATH\handle.exe" $file -accepteula 2>&1
 
     foreach ($line in $handleOutput) {
