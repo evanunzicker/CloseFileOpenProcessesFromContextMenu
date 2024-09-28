@@ -28,9 +28,8 @@ function Get-OpenFileProcessesUsingHandle {
 
     Write-Host "Checking for processes using handle.exe: '$file'"
     $fileProcesses = @()
-
-    # Run handle.exe and capture its output
-    $handleOutput = & "C:\Handle\handle.exe" $file -accepteula 2>&1
+#Replace 'PATH' with actual path to handle.exe
+    $handleOutput = & "C:\PATH\handle.exe" $file -accepteula 2>&1
 
     foreach ($line in $handleOutput) {
         if ($line -match '^(?<pid>\d+)\s+(?<processName>.+?)\s+[\[\(]') {
@@ -60,7 +59,6 @@ function Get-OpenFileProcessesUsingWMI {
             $processId = $process.ProcessId
             $processHandle = Get-Process -Id $processId -ErrorAction Stop
             
-            # Check if the file is loaded as a module
             foreach ($module in $processHandle.Modules) {
                 if ($module.FileName -eq $file) {
                     $fileProcesses += [PSCustomObject]@{
@@ -71,7 +69,6 @@ function Get-OpenFileProcessesUsingWMI {
                 }
             }
         } catch {
-            # Handle errors for missing processes
             Write-Host "Could not check process with PID $processId $($_.Exception.Message)"
         }
     }
@@ -79,11 +76,9 @@ function Get-OpenFileProcessesUsingWMI {
     return $fileProcesses
 }
 
-# Get processes that have the file open
 $fileProcessesFromHandle = Get-OpenFileProcessesUsingHandle -file $filePath
 $fileProcessesFromWMI = Get-OpenFileProcessesUsingWMI -file $filePath
 
-# Combine results and keep unique entries
 $fileProcesses = $fileProcessesFromHandle + $fileProcessesFromWMI
 $fileProcesses = $fileProcesses | Select-Object -Unique
 
@@ -95,8 +90,7 @@ if ($fileProcesses.Count -eq 0) {
         Write-Host "Process: $($_.ProcessName), PID: $($_.ProcessId)"
     }
 
-    # Automatically close the processes
-    $userInput = 'Y'  # Automatically set to 'Y'
+    $userInput = 'Y'
     
     if ($userInput -eq 'Y') {
         foreach ($process in $fileProcesses) {
@@ -105,7 +99,6 @@ if ($fileProcesses.Count -eq 0) {
                 Write-Host "Closed process $($process.ProcessName) with PID $($process.ProcessId)"
             } catch {
                 Write-Host "Failed to close process $($process.ProcessName) with PID $($process.ProcessId): $($_.Exception.Message)"
-                # Attempt to force kill if stopping failed
                 try {
                     Stop-Process -Id $process.ProcessId -Force -ErrorAction Stop
                     Write-Host "Force killed process $($process.ProcessName) with PID $($process.ProcessId)"
