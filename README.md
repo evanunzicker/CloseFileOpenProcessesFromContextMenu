@@ -3,7 +3,7 @@ Force closes any processes which has a file open
 
 Simply download the reg and ps1 files, amend the paths after downloaded in notepad or code editor, then merge reg key, right click file and enjoy!
 
-# !I WOULD LOVE FEEDBACK AND/OR ERRORS!
+# I WOULD LOVE FEEDBACK AND/OR ERRORS!
 
 Additional required material: handle.exe can be downloaded from the offical windows link:
 
